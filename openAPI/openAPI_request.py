@@ -89,6 +89,6 @@ def openAPI_request_detail(isbn_id):
             'publisher': publisher,
             'book_info': book_info,
             'book_thumbnail_image_url': book_thumbnail_image_url,
-            'imgs': book_image_list,
-            'authors': author_list
+            'book_image_list': book_image_list,
+            'author_list': author_list
         }

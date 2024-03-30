@@ -52,6 +52,7 @@ if __name__ == "__main__":
                 insert_book_thumbnail(cursor, inserted_book_id, result['book_thumbnail_image_url'])
 
                 # TODO : 도서 미리보기 이미지 insert
+                insert_book_image(cursor, inserted_book_id, result['book_image_list'])
 
                 # TODO : 도서 참여자 insert
 
