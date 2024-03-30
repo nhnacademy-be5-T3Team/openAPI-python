@@ -1,6 +1,8 @@
 
 import pymysql
 import secret
+from openAPI.dummy_data_maker import generate_dummy_email
+
 
 def getConnection():
     """데이터베이스에 연결하고 커서를 반환합니다."""
@@ -44,3 +46,22 @@ def insert_child_categories(cursor, category_df):
         execute_query(cursor, insert_query, (int(parent_category_id), category_name,))
 
         print(f"'{category_name}' 카테고리가 추가되었습니다.")
+
+
+def insert_publisher(cursor, publisher_name):
+    # 출판사 이름이 이미 데이터베이스에 있는지 확인
+    select_query = "SELECT publisher_id FROM publishers WHERE publisher_name = %s"
+    cursor.execute(select_query, (publisher_name,))
+    existing_publisher = cursor.fetchone()
+
+    if existing_publisher:
+        publisher_id = existing_publisher[0]
+        print(f"이미 '{publisher_name}' 출판사가 데이터베이스에 존재합니다. Primary key: {publisher_id}")
+        return publisher_id
+    else:
+        publisher_email = generate_dummy_email()
+        insert_query = "INSERT INTO publishers (publisher_name, publisher_email) VALUES (%s, %s)"
+        cursor.execute(insert_query, (publisher_name, publisher_email,))
+        inserted_publisher_id = cursor.lastrowid
+        print(f"출판사 이름 : '{publisher_name}', 출판사 이메일 : '{publisher_email}' 데이터가 추가되었습니다. primary key: {inserted_publisher_id}")
+        return inserted_publisher_id

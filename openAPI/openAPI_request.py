@@ -46,15 +46,12 @@ def openAPI_request_detail(isbn_id):
         'ItemId' : isbn_id
     }
 
-    # 요청을 보낼 URL
     url = secret.aladin_open_api_detail_url
 
-    # GET 요청을 보냄
     response = requests.get(url, params=params)
 
-    # 응답 확인
     if response.status_code == 200:
-        # xml 내용
+
         content = response.text
         soup = BeautifulSoup(content, 'xml')
 
@@ -76,14 +73,14 @@ def openAPI_request_detail(isbn_id):
         # 출판일
         book_published = data.find("pubDate").get_text()
 
-        # 책 이미지 URL
+        # 책 커버 이미지 URL
         book_thumbnail_image_url = data.find("cover").get_text()
 
-        # 책 이미지 URL들
-        imgs = [img.get_text() for img in data.find("bookinfo").find_all("letslookimg")]
+        # 책 미리보기 이미지 URL들
+        book_image_list = [img.get_text() for img in data.find("bookinfo").find_all("letslookimg")]
 
         # 작가들
-        authors = [author.get_text() for author in data.find("bookinfo").find("authors").find_all("author")]
+        author_list = [{"authorType":author.get("authorType"), "desc" : author.get("desc"), "name" : author.get_text() } for author in data.find("bookinfo").find("authors").find_all("author")]
 
         # 파싱된 값들을 반환
         return {
@@ -95,6 +92,6 @@ def openAPI_request_detail(isbn_id):
             'book_price': book_price,
             'book_published': book_published,
             'book_thumbnail_image_url': book_thumbnail_image_url,
-            'imgs': imgs,
-            'authors': authors
+            'imgs': book_image_list,
+            'authors': author_list
         }
