@@ -57,21 +57,23 @@ def openAPI_request_detail(isbn_id):
 
         data = soup.find("item")
 
+        book_info = {}
+
         # 출판사
         publisher = data.find("publisher").get_text()
 
         # 책 이름
-        book_name = data.find("title").get_text()
+        book_info["book_name"] = data.find("title").get_text()
         # 책 목차
-        book_index = data.find("bookinfo").find("toc").get_text()
+        book_info["book_index"] = data.find("bookinfo").find("toc").get_text()
         # 책 설명
-        book_desc = data.find("description").get_text()
+        book_info["book_desc"] = data.find("description").get_text()
         # 책 ISBN-13
-        book_isbn_13 = data.find("isbn13").get_text()
+        book_info["book_isbn_13"] = data.find("isbn13").get_text()
         # 책 가격
-        book_price = data.find("priceStandard").get_text()
+        book_info["book_price"] = data.find("priceStandard").get_text()
         # 출판일
-        book_published = data.find("pubDate").get_text()
+        book_info["book_published"] = data.find("pubDate").get_text()
 
         # 책 커버 이미지 URL
         book_thumbnail_image_url = data.find("cover").get_text()
@@ -85,12 +87,7 @@ def openAPI_request_detail(isbn_id):
         # 파싱된 값들을 반환
         return {
             'publisher': publisher,
-            'book_name': book_name,
-            'book_index': book_index,
-            'book_desc': book_desc,
-            'book_isbn_13': book_isbn_13,
-            'book_price': book_price,
-            'book_published': book_published,
+            'book_info': book_info,
             'book_thumbnail_image_url': book_thumbnail_image_url,
             'imgs': book_image_list,
             'authors': author_list

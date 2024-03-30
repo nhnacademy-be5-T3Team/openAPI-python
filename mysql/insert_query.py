@@ -1,7 +1,7 @@
 
 import pymysql
 import secret
-from openAPI.dummy_data_maker import generate_dummy_email
+from openAPI.dummy_data_maker import *
 
 
 def getConnection():
@@ -65,3 +65,16 @@ def insert_publisher(cursor, publisher_name):
         inserted_publisher_id = cursor.lastrowid
         print(f"출판사 이름 : '{publisher_name}', 출판사 이메일 : '{publisher_email}' 데이터가 추가되었습니다. primary key: {inserted_publisher_id}")
         return inserted_publisher_id
+
+def insert_book_info(cursor, book_info, publisher_id):
+
+    insert_query = "INSERT INTO books (publisher_id, book_name, book_index, book_desc, book_isbn_13, book_price, book_discount, book_package, book_published, book_stock) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    execute_query(cursor, insert_query,
+                  (publisher_id, book_info['book_name'],
+                   preprocessing_book_index(book_info['book_index']), book_info["book_desc"],
+                   book_info['book_isbn_13'], book_info['book_price'], generate_book_discount(),
+                   generate_book_package(), preprocessing_book_published(book_info['book_published']), generate_book_stock(),))
+    inserted_book_id = cursor.lastrowid
+
+    print(f"책 이름 : '{book_info['book_name']}', Primary key : '{inserted_book_id}' 데이터가 추가되었습니다.")
+    return inserted_book_id
