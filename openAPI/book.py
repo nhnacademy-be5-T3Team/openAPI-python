@@ -46,10 +46,10 @@ if __name__ == "__main__":
                 inserted_publisher_id = insert_publisher(cursor, result['publisher'])
 
                 # TODO : 도서 데이터 insert
-
                 inserted_book_id = insert_book_info(cursor, result['book_info'], inserted_publisher_id)
 
                 # TODO : 도서 썸네일 이미지 insert
+                insert_book_thumbnail(cursor, inserted_book_id, result['book_thumbnail_image_url'])
 
                 # TODO : 도서 미리보기 이미지 insert
 

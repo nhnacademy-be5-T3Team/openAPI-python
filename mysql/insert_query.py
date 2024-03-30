@@ -78,3 +78,9 @@ def insert_book_info(cursor, book_info, publisher_id):
 
     print(f"책 이름 : '{book_info['book_name']}', Primary key : '{inserted_book_id}' 데이터가 추가되었습니다.")
     return inserted_book_id
+
+def insert_book_thumbnail(cursor, book_id, image_url):
+    insert_query = "INSERT INTO book_thumbnails (book_id, thumbnail_image_url) VALUES (%s, %s)"
+    execute_query(cursor, insert_query, (book_id, image_url, ))
+
+    print(f"book_id : '{book_id}'에 대한 썸네일 이미지 데이터가 추가되었습니다.")
