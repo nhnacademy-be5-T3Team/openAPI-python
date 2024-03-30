@@ -93,3 +93,36 @@ def insert_book_image(cursor, book_id, image_url_list):
         execute_query(cursor, insert_query, (book_id, img_url, ))
 
     print(f"book_id : '{book_id}'에 대한 미리보기 이미지 데이터가 추가되었습니다.")
+
+def insert_book_participant(cursor, participant_name):
+
+    select_query = "SELECT participant_id FROM participants WHERE participant_name = %s"
+    execute_query(cursor, select_query, (participant_name,))
+    existing_book_participant = cursor.fetchone()
+
+    if existing_book_participant:
+        return existing_book_participant[0]
+    else:
+        insert_query = "INSERT INTO participants (participant_name, participant_email) VALUES (%s, %s)"
+        execute_query(cursor, insert_query, (participant_name, generate_dummy_email(), ))
+        inserted_participant_id = cursor.lastrowid
+
+        return inserted_participant_id
+
+def insert_book_participant_role(cursor, participant_role_name):
+    select_query = "SELECT participant_role_id FROM participant_roles WHERE participant_role_name = %s"
+    execute_query(cursor, select_query, (participant_role_name,))
+    existing_book_participant_role = cursor.fetchone()
+
+    if existing_book_participant_role:
+        return existing_book_participant_role[0]
+    else:
+        insert_query = "INSERT INTO participant_roles (participant_role_name) VALUES (%s)"
+        execute_query(cursor, insert_query, (participant_role_name, ))
+        inserted_participant_role_id = cursor.lastrowid
+
+        return inserted_participant_role_id
+
+def insert_book_participant_role_registration(cursor, book_id, participant_id, participant_role_id):
+    insert_query = "INSERT INTO participant_role_registrations (participant_id, participant_role_id, book_id) VALUES (%s, %s, %s)"
+    execute_query(cursor, insert_query, (participant_id, participant_role_id, book_id))

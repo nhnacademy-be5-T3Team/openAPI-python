@@ -54,11 +54,13 @@ if __name__ == "__main__":
                 # TODO : 도서 미리보기 이미지 insert
                 insert_book_image(cursor, inserted_book_id, result['book_image_list'])
 
-                # TODO : 도서 참여자 insert
-
-                # TODO : 도서 참여자 역할 insert
-
-                # TODO : 도서 참여자 관계 insert
+                for author in result['author_list']:
+                    # TODO : 도서 참여자 insert
+                    inserted_participant_id = insert_book_participant(cursor, author['name'])
+                    # TODO : 도서 참여자 역할 insert
+                    inserted_participant_role_id = insert_book_participant_role(cursor, author['authorType'])
+                    # TODO : 도서 참여자 관계 insert
+                    insert_book_participant_role_registration(cursor, inserted_book_id, inserted_participant_id, inserted_participant_role_id)
 
                 conn.commit()
                 conn.close()
