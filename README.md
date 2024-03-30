@@ -25,7 +25,8 @@
     pip install -r requirements.txt
     ```
     
-2. secret.py 구성
+2. secret.py 구성<br>
+openAPI_data 디렉토리 밑에 다음과 같이 secret.py을 생성합니다.
     ```bash
    host = "데이터베이스 url 주소"
    user = "데이터베이스 user 이름"
