@@ -1,7 +1,10 @@
-
 import pandas as pd
 from mysql.insert_query import *
 import os
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 def xls_to_df(file_path):
     """카테고리 xls 파일을 읽어, 최상위 부모 카테고리 dataframe과 한단계 하위 레벨 자식 카테고리 dataframe으로 분류합니다."""
@@ -40,12 +43,13 @@ def save_df_to_csv(category_df, file_name):
 
 if __name__ == "__main__":
 
-    file_name="aladin_Category_CID_20200626.xls"
+    file_name = "aladin_Category_CID_20200626.xls"
     file_path = os.path.join(os.getcwd(), '../resources/', file_name)
     root_category, child_category = xls_to_df(os.path.abspath(file_path))
 
-    conn, cursor = getConnection()
+    conn, cursor = get_connection()
 
+    root_category_id_df = []
     if conn and cursor:
         # 최상위 계층 부모 카테고리 데이터 insert, PrimaryKey category_id 저장
         root_category_id_df = insert_parent_categories(cursor, root_category)
@@ -55,26 +59,28 @@ if __name__ == "__main__":
         conn.close()
         print("MySQL 연결이 닫혔습니다.")
 
-    save_df_to_csv(root_category_id_df, 'root_category_id_df.csv')
+        save_df_to_csv(root_category_id_df, 'root_category_id_df.csv')
 
     # child_category dataframe의 부모 카테고리 정보를 root_category_id_df와 맵핑합니다.
     mapped_child_category = pd.merge(child_category, root_category_id_df, on='1Depth', how='left')
 
     # mapping이 되지 않은 값 확인
     unmapped_values = mapped_child_category[mapped_child_category['root_category_id'].isnull()]['1Depth'].tolist()
-    print("Mapping 되지 않은 값:", unmapped_values)
+    logger.info("Mapping 되지 않은 값:", unmapped_values)
 
     # mapping이 되지 않은 값 삭제
     mapped_child_category = mapped_child_category.dropna(subset=['root_category_id'])
 
     save_df_to_csv(mapped_child_category, 'mapped_child_category.csv')
 
-    conn, cursor = getConnection()
+    conn, cursor = get_connection()
     if conn and cursor:
         # 한단계 하위 레벨 자식 카테고리 데이터 insert
         category_df = insert_child_categories(cursor, mapped_child_category)
 
+        save_df_to_csv(category_df, 'mapped_child_category.csv')
+
         # 커밋 및 연결 종료
         conn.commit()
         conn.close()
-        print("MySQL 연결이 닫혔습니다.")
+        logger.info("MySQL 연결이 닫혔습니다.")
