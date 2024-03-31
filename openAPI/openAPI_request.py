@@ -1,24 +1,27 @@
 import requests
 from bs4 import BeautifulSoup
 import secret
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 def openAPI_request_search(query, category_id):
-    # 쿼리 파라미터 변수로 담기
+    """알라딘 opan API 도서 검색 요청"""
+
     params = {
         'ttbkey': secret.aladin_open_api_ttbkey,
-        'SearchTarget':'Book',
+        'SearchTarget': 'Book',
         'MaxResults': '10',
         'Query': query,
         'CategoryId': category_id
     }
 
-    # 요청을 보낼 URL
     url = secret.aladin_open_api_search_url
 
-    # GET 요청을 보냄
     response = requests.get(url, params=params)
 
-    # 응답 확인
     if response.status_code == 200:
         # xml 내용
         content = response.text
@@ -29,7 +32,7 @@ def openAPI_request_search(query, category_id):
         isbn_list = []
         if data:
             for item in data:
-                if(item.find("categoryId").get_text() == str(category_id)):
+                if item.find("categoryId").get_text() == str(category_id):
                     if item.find("isbn13").get_text():
                         isbn_list.append(item.find("isbn13").get_text())
 
@@ -39,11 +42,14 @@ def openAPI_request_search(query, category_id):
         # 응답이 실패한 경우
         print('Error:', response.status_code)
 
+
 def openAPI_request_detail(isbn_id):
+    """알라딘 openAPI 도서 상세 요청"""
+
     params = {
         'ttbkey': secret.aladin_open_api_ttbkey,
-        'itemIdType' : 'ISBN13',
-        'ItemId' : isbn_id
+        'itemIdType': 'ISBN13',
+        'ItemId': isbn_id
     }
 
     url = secret.aladin_open_api_detail_url
@@ -51,7 +57,6 @@ def openAPI_request_detail(isbn_id):
     response = requests.get(url, params=params)
 
     if response.status_code == 200:
-
         content = response.text
         soup = BeautifulSoup(content, 'xml')
 
@@ -82,7 +87,8 @@ def openAPI_request_detail(isbn_id):
         book_image_list = [img.get_text() for img in data.find("bookinfo").find_all("letslookimg")]
 
         # 작가들
-        author_list = [{"authorType":author.get("authorType"), "desc" : author.get("desc"), "name" : author.get_text() } for author in data.find("bookinfo").find("authors").find_all("author")]
+        author_list = [{"authorType": author.get("authorType"), "desc": author.get("desc"), "name": author.get_text()}
+                       for author in data.find("bookinfo").find("authors").find_all("author")]
 
         # 파싱된 값들을 반환
         return {
