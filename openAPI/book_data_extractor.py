@@ -17,8 +17,8 @@ def isbn_list_by_category_id(df):
         isbn_list = openAPI_request_search(category_name.split('/')[0], category_id)
         logger.info(f"카테고리 : '{category_name.split('/')[0]}'에 대한 도서 검색 api 요청")
 
-        if len(isbn_list) >= 2:
-            random_isbn_list = random.sample(isbn_list, 2)
+        if len(isbn_list) >= 5:
+            random_isbn_list = random.sample(isbn_list, 5)
         else:
             random_isbn_list = isbn_list
 
@@ -31,7 +31,6 @@ def isbn_list_by_category_id(df):
             result_list.append(data)
 
     result_df = pd.DataFrame(result_list)
-    result_df.to_csv('output.csv', index=False)
     save_df_to_csv(result_df, "openAPI_isbn.csv")
 
     return result_list
@@ -62,9 +61,9 @@ if __name__ == "__main__":
     csv_file_path = 'resources/mapped_child_category.csv'
     df = pd.read_csv(csv_file_path)
 
-    isbn_list = isbn_list_by_category_id(df)
+    #isbn_list = isbn_list_by_category_id(df)
 
-    #isbn_list = read_csv_to_list("resources/openAPI_isbn.csv")
+    isbn_list = read_csv_to_list("resources/openAPI_isbn.csv")
 
     for item in isbn_list:
         isbns = item['isbn_list']
