@@ -3,9 +3,8 @@ import pandas as pd
 from mysql.insert_query import *
 import os
 
-
 def xls_to_df(file_path):
-    """카테고리 xls 파일을 읽어, 최상위 계층 부모 카테고리 dataframe과 한단계 하위 레벨 자식 카테고리 dataframe으로 분류합니다."""
+    """카테고리 xls 파일을 읽어, 최상위 부모 카테고리 dataframe과 한단계 하위 레벨 자식 카테고리 dataframe으로 분류합니다."""
 
     df = pd.read_excel(file_path, header=2)
     df = df.fillna(0)
@@ -16,7 +15,7 @@ def xls_to_df(file_path):
     # 최상위 계층 부모 카테고리 dataframe 생성
     root_category = domestic_books_df[domestic_books_df['2Depth'] == 0][['CID', '1Depth']]
 
-    # 1depth 자식 카테고리
+    # 한단계 하위 레벨 자식 카테고리
     child_cateogry = domestic_books_df[(domestic_books_df['3Depth'] == 0) & (domestic_books_df['2Depth'] != 0)][
         ['CID', '1Depth', '2Depth']]
 
@@ -24,7 +23,7 @@ def xls_to_df(file_path):
 
 
 def save_df_to_csv(category_df, file_name):
-    """dataframe 파일을 resources 디렉토리 밑 csv 파일로 저장합니다."""
+    """dataframe 파일을 resources 디렉토리 아래의 csv 파일로 저장합니다."""
     # 저장할 폴더 경로 설정
     folder_path = 'resources'
 

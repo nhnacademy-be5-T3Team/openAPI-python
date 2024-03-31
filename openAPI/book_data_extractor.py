@@ -2,8 +2,12 @@ from mysql.insert_query import *
 from openAPI_request import *
 import pandas as pd
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def isbn_list_by_category_id():
+
+def isbn_list_by_category_id(df):
+    """주어진 카테고리 아이디로 도서 검색 OpenAPI를 요청하여 도서 ISBN 목록을 반환합니다"""
     list = []
     for index, row in df.iterrows():
         category_name = row['2Depth']
@@ -11,30 +15,32 @@ def isbn_list_by_category_id():
 
         isbn_list = openAPI_request_search(category_name, category_id)
 
+        random_values = random.sample(isbn_list, 2)
+
         if isbn_list:
             dict = {
                 "category_name": category_name,
                 "category_id": category_id,
-                "isbn_list" : isbn_list
+                "isbn_list": random_values
             }
             list.append(dict)
+
     return list
+
 
 if __name__ == "__main__":
     csv_file_path = 'resources/mapped_child_category.csv'
     df = pd.read_csv(csv_file_path)
 
-    isbn_list = isbn_list_by_category_id()
-
-    isbn_list = [{'category_name': '가계부', 'category_id': 90452, 'isbn_list': ['8809984880002', '8809983390007', '8809479920732', '8809529015272', '8809529015258', '8809529015265', '9788960306257', '8809850420028', '8809637010237', '8809637010220']}, {'category_name': '건강요리', 'category_id': 53471, 'isbn_list': ['9791189529116', '9788984688803']}]
+    isbn_list = isbn_list_by_category_id(df)
 
     for item in isbn_list:
         isbns = item['isbn_list']
 
         for isbn in isbns:
-            result = openAPI_request_detail("8809529015258")
+            result = openAPI_request_detail(isbn)
 
-            conn, cursor = getConnection()
+            conn, cursor = get_connection()
 
             if conn and cursor:
 
@@ -52,11 +58,14 @@ if __name__ == "__main__":
 
                 for author in result['author_list']:
                     # participants 테이블에 데이터 insert
-                    inserted_participant_id = insert_book_participant(cursor, author['name'])
+                    inserted_participant_id = insert_participant(cursor, author['name'])
                     # participant_roles 테이블에 데이터 insert
-                    inserted_participant_role_id = insert_book_participant_role(cursor, author['authorType'])
+                    inserted_participant_role_id = insert_participant_role(cursor, author['authorType'])
                     # participant_role_registration 테이블에 데이터 insert
-                    insert_book_participant_role_registration(cursor, inserted_book_id, inserted_participant_id, inserted_participant_role_id)
+                    insert_participant_role_registration(cursor, inserted_book_id, inserted_participant_id,
+                                                         inserted_participant_role_id)
+
+                insert_book_category(cursor, inserted_book_id, item['category_id'])
 
                 conn.commit()
                 conn.close()
