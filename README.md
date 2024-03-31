@@ -37,5 +37,5 @@ openAPI_data 디렉토리 밑에 다음과 같이 secret.py을 생성합니다.
    aladin_open_api_detail_url = "알라딘 Open API 도서 상세 조회 url"
     ```
 
-3. category.py 스크립트 실행 
-4. book.py 스크립트 실행
+3. openAPI/category_data_extractor.py 스크립트 실행
+4. openAPI/book_data_extractor.py 스크립트 실행
