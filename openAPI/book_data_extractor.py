@@ -91,7 +91,7 @@ if __name__ == "__main__":
                     # participants 테이블에 데이터 insert
                     inserted_participant_id = insert_participant(cursor, author['name'])
                     # participant_roles 테이블에 데이터 insert
-                    inserted_participant_role_id = insert_participant_role(cursor, author['authorType'])
+                    inserted_participant_role_id = insert_participant_role(cursor, author['authorType'], author['desc'])
                     # participant_role_registration 테이블에 데이터 insert
                     insert_participant_role_registration(cursor, inserted_book_id, inserted_participant_id,
                                                          inserted_participant_role_id)

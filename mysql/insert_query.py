@@ -127,17 +127,17 @@ def insert_participant(cursor, participant_name):
         return inserted_participant_id
 
 
-def insert_participant_role(cursor, participant_role_name):
+def insert_participant_role(cursor, participant_role_name_en, participant_role_name_kr):
     """participant_roles 테이블에 도서 참가자 역할 데이터를 insert합니다."""
-    select_query = "SELECT participant_role_id FROM participant_roles WHERE participant_role_name = %s"
-    execute_query(cursor, select_query, (participant_role_name,))
+    select_query = "SELECT participant_role_id FROM participant_roles WHERE participant_role_name_en = %s"
+    execute_query(cursor, select_query, (participant_role_name_en,))
     existing_book_participant_role = cursor.fetchone()
 
     if existing_book_participant_role:
         return existing_book_participant_role[0]
     else:
-        insert_query = "INSERT INTO participant_roles (participant_role_name) VALUES (%s)"
-        execute_query(cursor, insert_query, (participant_role_name,))
+        insert_query = "INSERT INTO participant_roles (participant_role_name_en, participant_role_name_kr) VALUES (%s, %s)"
+        execute_query(cursor, insert_query, (participant_role_name_en, participant_role_name_kr,))
         inserted_participant_role_id = cursor.lastrowid
 
         return inserted_participant_role_id
