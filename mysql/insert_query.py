@@ -78,20 +78,22 @@ def insert_publisher(cursor, publisher_name):
 
 def insert_book_info(cursor, book_info, publisher_id):
     """books 테이블에 도서 데이터를 insert합니다. 추가된 도서의 primary key를 반환합니다."""
+
     insert_query = ("INSERT INTO books (publisher_id, book_name, book_index, book_desc, book_isbn_13, book_price, "
                     "book_discount, book_package, book_published, book_stock) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,"
                     " %s, %s)")
+
     execute_query(cursor, insert_query,
                   (publisher_id, book_info['book_name'],
                    preprocessing_book_index(book_info['book_index']), book_info["book_desc"],
                    book_info['book_isbn_13'], book_info['book_price'], generate_book_discount(),
                    generate_book_package(), preprocessing_book_published(book_info['book_published']),
                    generate_book_stock(),))
+
     inserted_book_id = cursor.lastrowid
 
     logger.info(f"책 이름 : '{book_info['book_name']}', Primary key : '{inserted_book_id}' 데이터가 추가되었습니다.")
     return inserted_book_id
-
 
 def insert_book_thumbnail(cursor, book_id, image_url):
     """book_thumbnails 테이블에 썸네일 이미지 데이터를 insert합니다."""
