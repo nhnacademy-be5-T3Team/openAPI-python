@@ -17,16 +17,16 @@ def isbn_list_by_category_id(df):
         isbn_list = openAPI_request_search(category_name.split('/')[0], category_id)
         logger.info(f"카테고리 : '{category_name.split('/')[0]}'에 대한 도서 검색 api 요청")
 
-        if len(isbn_list) >= 5:
-            random_isbn_list = random.sample(isbn_list, 5)
-        else:
-            random_isbn_list = isbn_list
+        # if len(isbn_list) >= 5:
+        #     random_isbn_list = random.sample(isbn_list, 5)
+        # else:
+        #     random_isbn_list = isbn_list
 
         if isbn_list:
             data = {
                 "category_name": category_name,
                 "category_id": row['db_child_category_id'],
-                "isbn_list": random_isbn_list
+                "isbn_list": isbn_list
             }
             result_list.append(data)
 

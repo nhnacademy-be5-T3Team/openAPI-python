@@ -14,7 +14,7 @@ def openAPI_request_search(query, category_id):
     params = {
         'ttbkey': secret.aladin_open_api_ttbkey,
         'SearchTarget': 'Book',
-        'MaxResults': '10',
+        'MaxResults': '100',
         'Query': query,
         'CategoryId': category_id
     }
@@ -52,7 +52,8 @@ def openAPI_request_detail(isbn_id):
     params = {
         'ttbkey': secret.aladin_open_api_ttbkey,
         'itemIdType': 'ISBN13',
-        'ItemId': isbn_id
+        'ItemId': isbn_id,
+        'Cover': 'Big'
     }
 
     response = requests.get(secret.aladin_open_api_detail_url, params=params)
