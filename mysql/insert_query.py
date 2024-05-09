@@ -30,8 +30,8 @@ def insert_parent_categories(cursor, category_df):
     """카테고리 데이터프레임의 각 행을 순회하며 categories 테이블에 최상위 계층 부모 카테고리 데이터를 insert하고 primary key 값을 dataframe으로 반환합니다."""
     for index, row in category_df.iterrows():
         category_name = row['1Depth']
-        insert_query = "INSERT INTO categories (category_name) VALUES (%s)"
-        execute_query(cursor, insert_query, (category_name,))
+        insert_query = "INSERT INTO categories (category_name, depth) VALUES (%s, %s)"
+        execute_query(cursor, insert_query, (category_name, 1,))
         category_id = cursor.lastrowid
         category_df.at[index, 'root_category_id'] = int(category_id)
         logger.info(f"'{category_name}' 카테고리가 추가되었습니다. 삽입된 category_id: {category_id}")
@@ -45,8 +45,8 @@ def insert_child_categories(cursor, category_df):
     for index, row in category_df.iterrows():
         parent_category_id = row['root_category_id']
         category_name = row['2Depth']
-        insert_query = "INSERT INTO categories (parent_category_id, category_name) VALUES (%s, %s)"
-        execute_query(cursor, insert_query, (int(parent_category_id), category_name,))
+        insert_query = "INSERT INTO categories (parent_category_id, category_name, depth) VALUES (%s, %s, %s)"
+        execute_query(cursor, insert_query, (int(parent_category_id), category_name, 2,))
         category_id = cursor.lastrowid
         category_df.at[index, 'db_child_category_id'] = int(category_id)
         logger.info(f"'{category_name}' 카테고리가 추가되었습니다.")
@@ -80,35 +80,36 @@ def insert_book_info(cursor, book_info, publisher_id):
     """books 테이블에 도서 데이터를 insert합니다. 추가된 도서의 primary key를 반환합니다."""
 
     insert_query = ("INSERT INTO books (publisher_id, book_name, book_index, book_desc, book_isbn_13, book_price, "
-                    "book_discount, book_package, book_published, book_stock) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,"
-                    " %s, %s)")
+                    "book_discount, book_package, book_published, book_stock, is_deleted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,"
+                    " %s, %s, %s)")
 
     execute_query(cursor, insert_query,
                   (publisher_id, book_info['book_name'],
                    preprocessing_book_index(book_info['book_index']), book_info["book_desc"],
                    book_info['book_isbn_13'], book_info['book_price'], generate_book_discount(),
                    generate_book_package(), preprocessing_book_published(book_info['book_published']),
-                   generate_book_stock(),))
+                   generate_book_stock(), 0,))
 
     inserted_book_id = cursor.lastrowid
 
     logger.info(f"책 이름 : '{book_info['book_name']}', Primary key : '{inserted_book_id}' 데이터가 추가되었습니다.")
     return inserted_book_id
 
+
 def insert_book_thumbnail(cursor, book_id, image_url):
     """book_thumbnails 테이블에 썸네일 이미지 데이터를 insert합니다."""
-    insert_query = "INSERT INTO book_thumbnails (book_id, thumbnail_image_url) VALUES (%s, %s)"
-    execute_query(cursor, insert_query, (book_id, image_url,))
+    insert_query = "INSERT INTO book_thumbnails (book_id, thumbnail_image_url, is_deleted) VALUES (%s, %s, %s)"
+    execute_query(cursor, insert_query, (book_id, image_url, 0,))
 
     logger.info(f"book_id : '{book_id}'에 대한 썸네일 이미지 데이터가 추가되었습니다.")
 
 
 def insert_book_image(cursor, book_id, image_url_list):
     """book_images 테이블에 도서 이미지 데이터를 insert합니다."""
-    insert_query = "INSERT INTO book_images (book_id, book_image_url) VALUES (%s, %s)"
+    insert_query = "INSERT INTO book_images (book_id, book_image_url, is_deleted) VALUES (%s, %s, %s)"
 
     for img_url in image_url_list:
-        execute_query(cursor, insert_query, (book_id, img_url,))
+        execute_query(cursor, insert_query, (book_id, img_url, 0,))
 
     logger.info(f"book_id : '{book_id}'에 대한 미리보기 이미지 데이터가 추가되었습니다.")
 
@@ -147,10 +148,11 @@ def insert_participant_role(cursor, participant_role_name_en, participant_role_n
 
 def insert_participant_role_registration(cursor, book_id, participant_id, participant_role_id):
     """participant_role_registration 테이블에 도서 참가자 역할 등록 데이터를 insert합니다."""
-    insert_query = "INSERT INTO participant_role_registrations (participant_id, participant_role_id, book_id) VALUES (%s, %s, %s)"
-    execute_query(cursor, insert_query, (participant_id, participant_role_id, book_id))
+    insert_query = "INSERT INTO participant_role_registrations (participant_id, participant_role_id, book_id, is_deleted) VALUES (%s, %s, %s, %s)"
+    execute_query(cursor, insert_query, (participant_id, participant_role_id, book_id, 0))
+
 
 def insert_book_category(cursor, book_id, category_id):
     """book_categories 테이블에 도서와 카테고리의 맵핑 데이터를 insert합니다."""
-    insert_querty = "INSERT INTO book_categories (book_id, category_id) VALUES (%s, %s)"
-    execute_query(cursor, insert_querty, (book_id, category_id, ))
+    insert_querty = "INSERT INTO book_categories (book_id, category_id, is_deleted) VALUES (%s, %s, %s)"
+    execute_query(cursor, insert_querty, (book_id, category_id, 0,))
