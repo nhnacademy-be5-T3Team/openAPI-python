@@ -104,12 +104,11 @@ def insert_book_thumbnail(cursor, book_id, image_url):
     logger.info(f"book_id : '{book_id}'에 대한 썸네일 이미지 데이터가 추가되었습니다.")
 
 
-def insert_book_image(cursor, book_id, image_url_list):
+def insert_book_image(cursor, book_id, img_url):
     """book_images 테이블에 도서 이미지 데이터를 insert합니다."""
     insert_query = "INSERT INTO book_images (book_id, book_image_url, is_deleted) VALUES (%s, %s, %s)"
 
-    for img_url in image_url_list:
-        execute_query(cursor, insert_query, (book_id, img_url, 0,))
+    execute_query(cursor, insert_query, (book_id, img_url, 0,))
 
     logger.info(f"book_id : '{book_id}'에 대한 미리보기 이미지 데이터가 추가되었습니다.")
 
